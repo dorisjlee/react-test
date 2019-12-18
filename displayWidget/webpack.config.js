@@ -4,7 +4,7 @@ const version = require('./package.json').version;
 // Custom webpack rules
 const rules = [
   { test: /\.ts(x?)$/, loader: 'ts-loader' },
-  { test: /\.js$/, loader: 'source-map-loader' },
+  { test: /\.js(x?)$/, loader: 'source-map-loader' },
   { test: /\.css$/, use: ['style-loader', 'css-loader']}
 ];
 
@@ -12,7 +12,7 @@ const rules = [
 const externals = ['@jupyter-widgets/base', "React", "ReactDOM"];
 const resolve = {
   // Add '.ts' and '.tsx' as resolvable extensions.
-  extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+  extensions: [".webpack.js", ".web.js", ".ts", ".js",".tsx","jsx"]
 };
 
 module.exports = [

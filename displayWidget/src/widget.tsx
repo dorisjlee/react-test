@@ -57,10 +57,12 @@ class ExampleView extends DOMWidgetView {
         this.state = {
           value: backbone.model.get("value")
         }
+        // This binding is necessary to make `this` work in the callback
+        this.clickHandler = this.clickHandler.bind(this);
       }
 
       onChange(model:any){
-        this.setState(model.chnaged);
+        this.setState(model.changed);
       }
       componentDidMount(){
         backbone.listenTo(backbone.model,"change",this.onChange.bind(this));
@@ -69,10 +71,19 @@ class ExampleView extends DOMWidgetView {
       render(){
         console.log(this.state.value);
         // return React.createElement("h1",{},'Hello ${this.state.value}');
-        return React.createElement("h1",{},'Hello '+this.state.value);
-        // return <h1>Hello {this.state.value}</h1>
+        // return React.createElement("h1",{},'Hello '+this.state.value);
+        return <div><h1>Hello {this.state.value}</h1><button onClick={this.clickHandler}>Submit</button></div>
+      }
+      clickHandler(){
+        console.log("clicked")
+        // this.state = {value:"set to something else"}
+        this.setState(state => ({
+          value: "something else"
+        }));
+        backbone.touch();
       }
     }
+    
     const $app = document.createElement("div");
     const App = React.createElement(Hello);
     ReactDOM.render(App,$app);
