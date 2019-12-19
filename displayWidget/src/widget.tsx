@@ -41,63 +41,58 @@ export class ExampleModel extends DOMWidgetModel {
 }
 
 export class ExampleView extends DOMWidgetView {
-  initialize(){
-    const view = this;
-    interface AppProps{
-
-    }
-    interface AppState{
-      value:any
-    }
-    class Hello extends React.Component<AppProps,AppState> {
-      constructor(props:any){
-        super(props);
-        this.state = {
-          value: view.model.get("value")
-        }
-        // This binding is necessary to make `this` work in the callback
-        this.clickHandler = this.clickHandler.bind(this);
-      }
-
-      onChange(model:any){// not really called anywhere, not sure what this is for.
-        this.setState(model.changed);
-      }
-      componentDidMount(){ //triggered when component is mounted (i.e., when widget first rendered)
-        view.listenTo(view.model,"change",this.onChange.bind(this));
-      }
-
-      render(){
-        console.log(this.state.value);
-        // return React.createElement("h1",{},'Hello ${this.state.value}');
-        // return React.createElement("h1",{},'Hello '+this.state.value);
-        return <div><h1>Hello {this.state.value}</h1><button onClick={this.clickHandler}>Submit</button></div>
-      }
-      clickHandler(){
-        console.log("clicked")
-        // this.state = {value:"set to something else"}
-        this.setState(state => ({
-          value: "something else"
-        }));
-        // view.model.set('value',this.state.value);
-        // view.touch();
-      }
-    }
-    
+  initialize(){    
+    let view = this;
     const $app = document.createElement("div");
-    const App = React.createElement(Hello);
+    const App = React.createElement(Hello,view);
     ReactDOM.render(App,$app);
-
     view.el.append($app);
   }
+}
 
-  // render() {
-  //   this.el.classList.add('custom-widget');
+// interface AppProps{
+//   listenTo:any,
+//   model:any,
+//   touch:any
+// }
+interface AppState{
+  value:any
+}
+class Hello extends React.Component<ExampleView,AppState> {
+  constructor(props:any){
+    super(props);
+    console.log("view:",props);
+    this.state = {
+      value: props.model.get("value")
+    }
+    // This binding is necessary to make `this` work in the callback
+    this.clickHandler = this.clickHandler.bind(this);
+    
+  }
 
-  //   this.value_changed();
-  //   this.model.on('change:value', this.value_changed, this);
-  // }
+  onChange(model:any){// not really called anywhere, not sure what this is for.
+    this.setState(model.changed);
+  }
+  componentDidMount(){ //triggered when component is mounted (i.e., when widget first rendered)
+    let view = this.props;
+    view.listenTo(view.model,"change",this.onChange.bind(this));
+    // props.listenTo(props.model,"change",this.onChange.bind(this));
+  }
 
-  // value_changed() {
-  //   this.el.textContent = "bob";//this.model.get('value');
-  // }
+  render(){
+    console.log(this.state.value);
+    // return React.createElement("h1",{},'Hello ${this.state.value}');
+    // return React.createElement("h1",{},'Hello '+this.state.value);
+    return <div><h1>Hello {this.state.value}</h1><button onClick={this.clickHandler}>Submit</button></div>
+  }
+  clickHandler(){
+    console.log("clicked")
+    // this.state = {value:"set to something else"}
+    this.setState(state => ({
+      value: "something else"
+    }));
+    console.log(this.props) // VM1302:1 Uncaught ReferenceError: view is not defined
+    this.props.model.set('value',this.state.value);
+    this.props.touch();
+  }
 }
