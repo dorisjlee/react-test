@@ -15,8 +15,7 @@ import '../css/widget.css'
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-export
-class ExampleModel extends DOMWidgetModel {
+export class ExampleModel extends DOMWidgetModel {
   defaults() {
     return {...super.defaults(),
       _model_name: ExampleModel.model_name,
@@ -41,10 +40,9 @@ class ExampleModel extends DOMWidgetModel {
   
 }
 
-export
-class ExampleView extends DOMWidgetView {
+export class ExampleView extends DOMWidgetView {
   initialize(){
-    const backbone = this;
+    const view = this;
     interface AppProps{
 
     }
@@ -55,17 +53,17 @@ class ExampleView extends DOMWidgetView {
       constructor(props:any){
         super(props);
         this.state = {
-          value: backbone.model.get("value")
+          value: view.model.get("value")
         }
         // This binding is necessary to make `this` work in the callback
         this.clickHandler = this.clickHandler.bind(this);
       }
 
-      onChange(model:any){
+      onChange(model:any){// not really called anywhere, not sure what this is for.
         this.setState(model.changed);
       }
-      componentDidMount(){
-        backbone.listenTo(backbone.model,"change",this.onChange.bind(this));
+      componentDidMount(){ //triggered when component is mounted (i.e., when widget first rendered)
+        view.listenTo(view.model,"change",this.onChange.bind(this));
       }
 
       render(){
@@ -80,7 +78,8 @@ class ExampleView extends DOMWidgetView {
         this.setState(state => ({
           value: "something else"
         }));
-        backbone.touch();
+        // view.model.set('value',this.state.value);
+        // view.touch();
       }
     }
     
@@ -88,7 +87,7 @@ class ExampleView extends DOMWidgetView {
     const App = React.createElement(Hello);
     ReactDOM.render(App,$app);
 
-    backbone.el.append($app);
+    view.el.append($app);
   }
 
   // render() {
