@@ -54,7 +54,7 @@ export class ExampleView extends DOMWidgetView {
           value: props.model.get("value")
         }
         // This binding is necessary to make `this` work in the callback
-        this.clickHandler = this.clickHandler.bind(this);
+        this.changeHandler = this.changeHandler.bind(this);
         
       }
   
@@ -75,17 +75,28 @@ export class ExampleView extends DOMWidgetView {
         console.log(this.state.value);
         // return React.createElement("h1",{},'Hello ${this.state.value}');
         // return React.createElement("h1",{},'Hello '+this.state.value);
-        return <div><h1>Hello {this.state.value}</h1><button onClick={this.clickHandler}>Submit</button></div>
+        // return <div>
+        //         <input placeholder="Hello ${this.state.value}" id="textbox"></input>
+        //         <button onClick={this.changeHandler}>Submit</button>
+        //        </div>
+        return <input type="text" 
+                         value={this.state.value} 
+                         onChange={this.changeHandler} 
+                         placeholder={this.state.value}/>
       }
-      clickHandler(){
+      changeHandler(event:any){
+        console.log("event:",event);
         console.log("view value:",view.model.get("value"))
         console.log("clicked")
         // this.state = {value:"set to something else"}
+        // var inputVal = document.getElementById("textbox");
+        // if (inputVal){inputVal = inputVal.innerHTML;}
+        var inputVal = event.target.value
         this.setState(state => ({
-          value: "something else"
+          value: inputVal
         }));
         // console.log(view) // VM1302:1 Uncaught ReferenceError: view is not defined
-        view.model.set('value',"Hello New");//this.state.value
+        view.model.set('value',inputVal);//this.state.value
         // view.touch();
         // console.log("after view value:",view.model.get("value"));
         // view.model.set('value2',"val2test");//this.state.value
