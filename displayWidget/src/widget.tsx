@@ -43,56 +43,57 @@ export class ExampleModel extends DOMWidgetModel {
 export class ExampleView extends DOMWidgetView {
   initialize(){    
     let view = this;
+    // this.options = {iopub_callbacks : true};
+    class Hello extends React.Component<ExampleView,{
+      value:any
+    }> {
+      constructor(props:any){
+        super(props);
+        console.log("view:",props);
+        this.state = {
+          value: props.model.get("value")
+        }
+        // This binding is necessary to make `this` work in the callback
+        this.clickHandler = this.clickHandler.bind(this);
+        
+      }
+  
+      onChange(model:any){// called when the variable is changed in the view.model (trigger via componentDidMount)
+        this.setState(model.changed);
+        // view.touch();
+      }
+      componentDidMount(){ //triggered when component is mounted (i.e., when widget first rendered)
+        view.listenTo(view.model,"change",this.onChange.bind(this));
+        // props.listenTo(props.model,"change",this.onChange.bind(this));
+      }
+      componentDidUpdate(){ //Triggered after component is updated
+        console.log(view.model.get("value"));
+        view.model.save_changes(); // instead of touch (which leads to callback issues), we have to use save_changes
+      }
+  
+      render(){
+        console.log(this.state.value);
+        // return React.createElement("h1",{},'Hello ${this.state.value}');
+        // return React.createElement("h1",{},'Hello '+this.state.value);
+        return <div><h1>Hello {this.state.value}</h1><button onClick={this.clickHandler}>Submit</button></div>
+      }
+      clickHandler(){
+        console.log("view value:",view.model.get("value"))
+        console.log("clicked")
+        // this.state = {value:"set to something else"}
+        this.setState(state => ({
+          value: "something else"
+        }));
+        // console.log(view) // VM1302:1 Uncaught ReferenceError: view is not defined
+        view.model.set('value',"Hello New");//this.state.value
+        // view.touch();
+        // console.log("after view value:",view.model.get("value"));
+        // view.model.set('value2',"val2test");//this.state.value
+      }
+    }
     const $app = document.createElement("div");
     const App = React.createElement(Hello,view);
     ReactDOM.render(App,$app);
     view.el.append($app);
-  }
-}
-
-// interface AppProps{
-//   listenTo:any,
-//   model:any,
-//   touch:any
-// }
-interface AppState{
-  value:any
-}
-class Hello extends React.Component<ExampleView,AppState> {
-  constructor(props:any){
-    super(props);
-    console.log("view:",props);
-    this.state = {
-      value: props.model.get("value")
-    }
-    // This binding is necessary to make `this` work in the callback
-    this.clickHandler = this.clickHandler.bind(this);
-    
-  }
-
-  onChange(model:any){// not really called anywhere, not sure what this is for.
-    this.setState(model.changed);
-  }
-  componentDidMount(){ //triggered when component is mounted (i.e., when widget first rendered)
-    let view = this.props;
-    view.listenTo(view.model,"change",this.onChange.bind(this));
-    // props.listenTo(props.model,"change",this.onChange.bind(this));
-  }
-
-  render(){
-    console.log(this.state.value);
-    // return React.createElement("h1",{},'Hello ${this.state.value}');
-    // return React.createElement("h1",{},'Hello '+this.state.value);
-    return <div><h1>Hello {this.state.value}</h1><button onClick={this.clickHandler}>Submit</button></div>
-  }
-  clickHandler(){
-    console.log("clicked")
-    // this.state = {value:"set to something else"}
-    this.setState(state => ({
-      value: "something else"
-    }));
-    console.log(this.props) // VM1302:1 Uncaught ReferenceError: view is not defined
-    this.props.model.set('value',this.state.value);
-    this.props.touch();
   }
 }
